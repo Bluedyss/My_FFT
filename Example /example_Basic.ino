@@ -1,8 +1,6 @@
 #include "My_FFT.h"
 
 #define N 256  // FFT size
-#define SAMPLING_FREQ 1000  // Sampling frequency (1kHz)
-#define SIGNAL_FREQ 50  // Sine wave frequency (50Hz)
 #define A0_PIN A0  // ADC pin for input signal
 
 float real[N];  // Real part of the FFT
@@ -11,14 +9,19 @@ My_FFT fft(N);  // Create an FFT object
 
 void setup() {
     Serial.begin(115200);
+    // Initialize arrays
+    for (int i = 0; i < N; i++) {
+        real[i] = 0.0;  // Start with a zero signal
+        imag[i] = 0.0;
+    }
 }
 
 void loop() {
-    // Generate a sine wave
+    // Sample the analog signal
     for (int i = 0; i < N; i++) {
-        real[i] = 512 + 512 * sin(2 * PI * SIGNAL_FREQ * i / SAMPLING_FREQ);  // Generate sine wave
-        imag[i] = 0.0;  // Imaginary part is 0
-        delayMicroseconds(1000);  // Simulate the sampling rate
+        real[i] = analogRead(A0_PIN);  // Read the signal from A0
+        imag[i] = 0.0;  // Imaginary part is 0 for real signal
+        delayMicroseconds(100);  // Delay to simulate sampling rate
     }
 
     // Compute the FFT
