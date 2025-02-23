@@ -1,17 +1,17 @@
 #ifndef MY_FFT_H
 #define MY_FFT_H
 
-#include <math.h>
+#include <Arduino.h>
 
 class My_FFT {
 public:
-    My_FFT(int n);
-    void compute(float* real, float* imag);
-    
+    My_FFT(int n);  // Constructor with the FFT size
+    void compute(float* real, float* imag);  // Compute FFT
+
 private:
-    int n;  // Počet vzorků (musí být mocnina 2)
-    void fft(float* real, float* imag);
-    void bitReverseSwap(float* real, float* imag);
+    int N;  // FFT size
+    void bitReversal(float* real, float* imag);  // Bit reversal process
+    void fftCalculation(float* real, float* imag);  // FFT calculation
 };
 
 #endif
