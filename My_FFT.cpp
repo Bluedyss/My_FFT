@@ -1,26 +1,52 @@
 #include "My_FFT.h"
+#include <math.h>
 
 My_FFT::My_FFT(int n) {
-    this->n = n;
+    N = n;  // Initialize FFT size
 }
 
 void My_FFT::compute(float* real, float* imag) {
-    // Předpočítání bitového zrcadlení
-    bitReverseSwap(real, imag);
-    // Výpočet FFT
-    fft(real, imag);
+    bitReversal(real, imag);  // Perform bit reversal step
+    fftCalculation(real, imag);  // Perform FFT calculation
 }
 
-void My_FFT::fft(float* real, float* imag) {
-    int len, i, j, k;
-    float tReal, tImag, uReal, uImag, wReal, wImag, angle;
+void My_FFT::bitReversal(float* real, float* imag) {
+    int i, j, bit, len;
+    float tempReal, tempImag;
     
-    for (len = 2; len <= n; len <<= 1) {
-        angle = -2.0 * M_PI / len;
+    j = 0;
+    for (i = 1; i < N; i++) {
+        bit = N >> 1;
+        while (j >= bit) {
+            j -= bit;
+            bit >>= 1;
+        }
+        j += bit;
+
+        if (i < j) {
+            // Swap real parts
+            tempReal = real[i];
+            real[i] = real[j];
+            real[j] = tempReal;
+
+            // Swap imaginary parts
+            tempImag = imag[i];
+            imag[i] = imag[j];
+            imag[j] = tempImag;
+        }
+    }
+}
+
+void My_FFT::fftCalculation(float* real, float* imag) {
+    int len, step, i, j;
+    float angle, wReal, wImag, uReal, uImag, tReal, tImag;
+
+    for (len = 2; len <= N; len <<= 1) {
+        angle = -2.0 * PI / len;
         wReal = cos(angle);
         wImag = sin(angle);
 
-        for (i = 0; i < n; i += len) {
+        for (i = 0; i < N; i += len) {
             uReal = 1.0;
             uImag = 0.0;
 
@@ -44,26 +70,3 @@ void My_FFT::fft(float* real, float* imag) {
     }
 }
 
-void My_FFT::bitReverseSwap(float* real, float* imag) {
-    int i, j, k;
-    float tReal, tImag;
-
-    j = 0;
-    for (i = 1; i < n; i++) {
-        int bit = n >> 1;
-        while (j >= bit) {
-            j -= bit;
-            bit >>= 1;
-        }
-        j += bit;
-        if (i < j) {
-            tReal = real[i];
-            real[i] = real[j];
-            real[j] = tReal;
-
-            tImag = imag[i];
-            imag[i] = imag[j];
-            imag[j] = tImag;
-        }
-    }
-}
