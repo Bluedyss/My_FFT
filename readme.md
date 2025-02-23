@@ -1,35 +1,35 @@
-# FFT na ESP32
+# FFT on ESP32
 
-Tento projekt ukazuje, jak použít Fourierovu transformaci (FFT) na ESP32 pro analýzu signálu z mikrofonu nebo jiného analogového zdroje. Pomocí této implementace můžete snímat signál a zjistit intenzitu konkrétních frekvencí.
+This project demonstrates how to use the Fast Fourier Transform (FFT) on an ESP32 to analyze signals from a microphone or other analog sources. With this implementation, you can sample a signal and identify the intensity of specific frequencies.
 
-## Požadavky
+## Requirements
 
-- **ESP32** nebo jiný mikrokontrolér kompatibilní s knihovnou **Wire**.
-- **Arduino IDE** s nainstalovaným ESP32 frameworkem.
-- Knihovna **My_FFT** pro výpočet FFT.
+- **ESP32** or any other microcontroller compatible with the **Wire** library.
+- **Arduino IDE** with the ESP32 framework installed.
+- **My_FFT** library for FFT calculation.
 
 ## Hardware
 
-- **ESP32** deska.
-- Mikrofonní modul nebo jakýkoli jiný analogový vstup připojený na pin A0.
+- **ESP32** board.
+- A microphone module or any other analog input connected to pin A0.
 
-## Instalace
+## Installation
 
-1. Stáhněte tento repozitář nebo zkopírujte kód do vaší Arduino IDE.
-2. Ujistěte se, že máte správně nastavený **ESP32** v Arduino IDE (přes **Nástroje > Deska > ESP32 Dev Module**).
-3. Ujistěte se, že máte nainstalovanou knihovnu **My_FFT**.
-4. Připojte váš mikrofon nebo jiný analogový signál k pinu **A0** (nebo změňte pin v kódu).
-5. Nahrát kód do ESP32.
+1. Download this repository or copy the code into your Arduino IDE.
+2. Ensure that the **ESP32** is properly set in your Arduino IDE (**Tools > Board > ESP32 Dev Module**).
+3. Make sure you have the **My_FFT** library installed.
+4. Connect your microphone or another analog signal to pin **A0** (or change the pin in the code).
+5. Upload the code to the ESP32.
 
-## Kód
+## Code
 
 ```cpp
 #include <Wire.h>
 #include "My_FFT.h"
 
-#define A0_PIN 34  // Mikrofonní vstup
-#define N 256  // FFT velikost
-#define SAMPLE_RATE 32000  // 32 kHz vzorkovací frekvence
+#define A0_PIN 34  // Microphone input
+#define N 256  // FFT size
+#define SAMPLE_RATE 32000  // 32 kHz sampling rate
 
 float real[N];
 float imag[N];
@@ -44,17 +44,17 @@ void setup() {
 }
 
 void loop() {
-    // 1️⃣ Vzorkování
+    // 1 Sampling
     for (int i = 0; i < N; i++) {
-        real[i] = (analogRead(A0_PIN) / 4095.0) * 3.3 - 1.65;  // Mapování ADC na -1.65 až 1.65 V
+        real[i] = (analogRead(A0_PIN) / 4095.0) * 3.3 - 1.65;  // Mapping ADC to -1.65 to 1.65 V
         imag[i] = 0.0;
         delayMicroseconds(1000000 / SAMPLE_RATE);
     }
 
-    // 2️⃣ Výpočet FFT pomocí knihovny
+    //  FFT computation using the library
     fftProcessor.compute(real, imag);
 
-    // 3️⃣ Výběr konkrétních frekvencí
+    //  Selecting specific frequencies
     int spectrum[NUM_FREQS] = {0};
     for (int j = 0; j < NUM_FREQS; j++) {
         int index = (targetFreqs[j] * N) / SAMPLE_RATE;
@@ -62,8 +62,8 @@ void loop() {
         spectrum[j] = map(magnitude, 0, 5000, 0, 100);
     }
 
-    // 4️⃣ Výpis do Serial Monitoru
-    Serial.println("Frekvence | Síla");
+    //  Output to Serial Monitor
+    Serial.println("Frequency | Intensity");
     for (int j = 0; j < NUM_FREQS; j++) {
         Serial.print(targetFreqs[j]);
         Serial.print(" Hz | ");
